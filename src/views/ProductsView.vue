@@ -71,6 +71,20 @@ import axios from 'axios';
       </div>
 
       <div class="col-md">
+        <div class="row mb-2">
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Search title here"
+                autocomplete="off"
+                v-model="text_search"
+              />
+              <label for="floatingPassword">Search title</label>
+            </div>
+          </div>
+        </div>
         <div class="table-responsive">
           <table class="table table-primary">
             <thead>
@@ -130,6 +144,7 @@ export default {
         "women's clothing",
       ],
       message: null,
+      text_search: null,
     };
   },
 
@@ -137,11 +152,21 @@ export default {
     this.init();
   },
 
+  watch: {
+    text_search(e) {
+      if (e === '') this.init();
+      this.products = this.products.filter(p => {
+        const manipulatedTitle = p.title.toLowerCase();
+        const manipulatedSearchQuery = e.toLowerCase();
+        return manipulatedTitle.includes(manipulatedSearchQuery);
+      });
+    },
+  },
+
   methods: {
     async init() {
       const { data } = await axios.get(this.api);
       this.products = data;
-      console.log(data.map(d => d.category));
 
       if (this.$route.query.id) {
         const { data } = await axios.get(`${this.api}/${this.$route.query.id}`);
